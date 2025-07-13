@@ -4,3 +4,11 @@ synth:
 
 clean:
 	rm -r ./obj_dir
+	rm image.svg
+
+visualise_graphviz:
+	yosys -p "read_verilog zero_counter.v; show"
+
+visualise_netlistsvg:
+	yosys -p "read_verilog zero_counter.v; prep -top zero_counter; write_json ./obj_dir/vis.json"
+	netlistsvg ./obj_dir/vis.json -o image.svg

@@ -2,8 +2,8 @@
 
 module shift_fifo 
 #(
-    parameter DATA_W,
-    parameter SIZE
+    parameter DATA_W = 8,
+    parameter SIZE = 4
 )
 (
     input clk,

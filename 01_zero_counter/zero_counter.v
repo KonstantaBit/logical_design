@@ -2,7 +2,7 @@
 
 module zero_counter 
 #(
-    parameter IN_W,
+    parameter IN_W = 8,
     parameter OUT_W = $clog2(IN_W + 1)
 )
 (
