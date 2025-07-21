@@ -1,67 +1,84 @@
-/* verilator lint_off UNUSEDSIGNAL */
-/* verilator lint_off UNDRIVEN */
+/* verilator lint_off WIDTHTRUNC */
 
 module testbench;
+    
+    parameter DATA_W = 8;
 
-parameter DATA_W = 8;
-parameter SIZE   = 4;
+    reg                 clk=0;
+    reg                 reset=1;
 
-reg clk;
-reg reset;
-reg write;
-reg read;
-reg [DATA_W - 1:0] datain;
-wire [DATA_W - 1:0] dataout;
-wire val;
-wire full;
+    reg                 write, read;
+    reg  [DATA_W-1:0]   datain;
 
-shift_fifo #(.DATA_W(DATA_W), .SIZE(SIZE)) unit (
-    .clk(clk),
-    .reset(reset),
-    .write(write),
-    .read(read),
-    .datain(datain),
-    .dataout(dataout),
-    .val(val),
-    .full(full)
-);
+    wire                val_sh, val_cr;
+    wire                full_sh, full_cr;
+    wire [DATA_W-1:0]   dataout_sh, dataout_cr;
 
-initial begin
-    clk = 0;
-    forever #5 clk = ~clk; // Тактовый сигнал с периодом 10 единиц времени
-end
+    always
+        #1 clk <= ~clk;
 
-initial begin
-    $dumpfile("trace.vcd");
-    $dumpvars();
+    initial begin
+        $dumpfile("trace.vcd");
+        $dumpvars();
+        repeat (3) @(posedge clk);
+        reset = 0;
+        #1000000
+        $finish();
+    end
 
-    reset = 1;
-    #10;
-    reset = 0;
-    #10;
-    $display("Writing:");
-    write = 1; datain = 8'h01; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    write = 1; datain = 8'h02; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    write = 1; datain = 8'h03; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    write = 1; datain = 8'h04; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    write = 0;
+    ring_fifo
+    #(
+        .SIZE       (10)
+    )   ring_fifo
+    (
+        .clk        (clk),
+        .rst        (reset),
+        .write      (write),
+        .in         (datain),
+        .read       (read),
+        .out        (dataout_cr),
+        .val        (val_cr),
+        .full       (full_cr)
+    );
 
-    $display("\nReading:");
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 0;
+    shift_fifo
+    #(
+        .SIZE       (10)
+    )   shift_fifo
+    (
+        .clk        (clk),
+        .rst        (reset),
+        .write      (write),
+        .in         (datain),
+        .read       (read),
+        .out        (dataout_sh),
+        .val        (val_sh),
+        .full       (full_sh)
+    );
 
-    $display("\nWriting & reading simultaneously");
-    write = 1; datain = 8'h05; #10;
-    datain = 8'h06; read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
-    read = 0;
-    write = 0;
-    read = 1; #10; $display("Read: %h, Valid: %b, Full: %b", dataout, val, full);
+    always @(posedge clk)
+    begin
+        datain <= $random() % (1 << DATA_W);
+        write  <= $random() % 2;
+        read   <= $random() % 2;
+    end
 
-    $finish;
-end
+    always @(negedge clk)
+    begin
+        if(!reset) begin
+            if( val_sh !== val_cr) begin
+                $display("VAL ERROR");
+                $stop();
+            end
+            else if (val_sh & (dataout_sh !== dataout_cr)) begin
+                $display("DATA ERROR");
+                $stop();
+            end
+            if( full_sh !== full_cr) begin
+                $display("FULL ERROR");
+                $stop();
+            end
+        end
+    end
 
 endmodule
