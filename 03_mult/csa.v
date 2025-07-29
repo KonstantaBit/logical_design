@@ -1,9 +1,6 @@
-/* verilator lint_off WIDTHTRUNC */
-/* verilator lint_off WIDTHEXPAND */
-
 module csa 
 #(
-    parameter WIDE = 8
+    parameter WIDE = 16
 )
 (
     input  [WIDE - 1:0] a,
