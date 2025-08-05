@@ -1,0 +1,42 @@
+module opcode_analyzer #(
+    parameter IS_DOUBLE  = 0,
+    parameter WIDTH      = IS_DOUBLE == 1 ? 64 : 32
+) (
+    input [WIDTH - 1:0] op1,
+    input [WIDTH - 1:0] op2,
+    input               opcode,
+    output              error
+);
+            
+    wire is_zero1;
+    wire is_nan1;
+    wire is_inf1;
+    wire is_norm1;
+    wire is_denorm1;
+        
+    op_analyzer #(.IS_DOUBLE(IS_DOUBLE)) op_an1 (
+        .op(op1)
+        .is_zero(is_zero1),
+        .is_nan(is_nan1),
+        .is_inf(is_inf1),
+        .is_norm(is_norm1),
+        .is_denorm(is_denorm1),
+    );
+
+    wire is_zero2;
+    wire is_nan2;
+    wire is_inf2;
+    wire is_norm2;
+    wire is_denorm2;
+
+    op_analyzer #(.IS_DOUBLE(IS_DOUBLE)) op_an2 (
+        .op(op2)
+        .is_zero(is_zero2),
+        .is_nan(is_nan2),
+        .is_inf(is_inf2),
+        .is_norm(is_norm2),
+        .is_denorm(is_denorm2),
+    );
+
+    assign error = (opcode != 0) & ( is_nan1 | is_nan2 | (is_zero1 & is_inf2) | (is_inf1 & is_zero2) );
+endmodule
