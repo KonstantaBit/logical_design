@@ -4,12 +4,9 @@ module op_analyzer #(
     parameter EXPONENT_W = IS_DOUBLE == 1 ? 11 : 8,
     parameter MANTISSA_W = IS_DOUBLE == 1 ? 52 : 23
 ) (
-    input [WIDTH - 1:0] op
-    output              is_zero,
-    output              is_nan,
-    output              is_inf,
-    output              is_norm,
-    output              is_denorm 
+    input [WIDTH - 1:0] op1,
+    input [WIDTH - 1:0] op2,
+    output              res 
 );
     wire [MANTISSA_W - 1:0] mantissa;
     wire [EXPONENT_W - 1:0] exponent;

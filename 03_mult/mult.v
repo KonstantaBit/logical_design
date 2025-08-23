@@ -1,7 +1,7 @@
 /* verilator lint_off WIDTHTRUNC */
 /* verilator lint_off WIDTHEXPAND */
 
-module top
+module mult
 #(
     parameter WIDE = 8
 )
