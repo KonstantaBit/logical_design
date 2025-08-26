@@ -4,8 +4,10 @@ module opcode_analyzer #(
 ) (
     input [WIDTH - 1:0] op1,
     input [WIDTH - 1:0] op2,
-    input               opcode,
-    output              error
+    output              is_nan,
+    output              is_inf,
+    output              is_zero,
+    output              is_invalid
 );
             
     wire is_zero1;
@@ -38,5 +40,8 @@ module opcode_analyzer #(
         .is_denorm(is_denorm2),
     );
 
-    assign error = (opcode != 0) & ( is_nan1 | is_nan2 | (is_zero1 & is_inf2) | (is_inf1 & is_zero2) );
+    assign is_nan     = is_nan1  | is_nan2;
+    assign is_inf     = is_inf1  | is_inf2;
+    assign is_zero    = is_zero1 | is_zero2;
+    assign is_invalid = (is_zero1 & is_inf2) | (is_inf1 & is_zero2);
 endmodule
