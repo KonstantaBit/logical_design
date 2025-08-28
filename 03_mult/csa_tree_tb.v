@@ -8,7 +8,6 @@ module csa_tree_tb;
     wire [WIDTH - 1:0]     ps;
     wire [WIDTH - 1:0]     pc;
 
-    // Инстанцируем DUT
     csa_tree #(.WIDTH(WIDTH), .N(N)) tree (
         .signals(x),
         .ps(ps),

@@ -1,6 +1,7 @@
-module opcode_analyzer #(
-    parameter IS_DOUBLE  = 0,
-    parameter WIDTH      = IS_DOUBLE == 1 ? 64 : 32
+module operation_analyzer #(
+    parameter WIDTH = 32,
+    parameter EXP_W  = 8,
+    parameter MANT_W = 23
 ) (
     input [WIDTH - 1:0] op1,
     input [WIDTH - 1:0] op2,
@@ -16,7 +17,7 @@ module opcode_analyzer #(
     wire is_norm1;
     wire is_denorm1;
         
-    op_analyzer #(.IS_DOUBLE(IS_DOUBLE)) op_an1 (
+    op_analyzer #(.WIDTH(IS_DOUBLE)) op_an1 (
         .op(op1)
         .is_zero(is_zero1),
         .is_nan(is_nan1),
