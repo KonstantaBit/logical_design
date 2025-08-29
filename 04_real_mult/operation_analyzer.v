@@ -45,4 +45,4 @@ module operation_analyzer #(
     assign is_inf     = is_inf1  | is_inf2;
     assign is_zero    = is_zero1 | is_zero2;
     assign is_invalid = (is_zero1 & is_inf2) | (is_inf1 & is_zero2);
-endmodule
+endmodule // Зачем нужен, если в top проще собрать? :Р
